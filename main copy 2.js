@@ -56,29 +56,11 @@ peer.on('open', id => {
 $('#btnCall').click(() => {
     const id = $('#remoteId').val();
     openStream()
-    .then(async stream => {
-	     let recorder = RecordRTC(stream, {
-        type: 'audio'
-		});
-	    recorder.startRecording();
-	    
-	     const sleep = m => new Promise(r => setTimeout(r, m));
-		 
-	    
-        playStream('localStream', stream);
+    .then(stream => {
+       // playStream('localStream', stream);
         const call = peer.call(id, stream);
-        call.on('stream', remoteStream => 
-        playStream('remoteStream', remoteStream))
-        
-        await sleep(10000);
-        
-        recorder.stopRecording(function() {
-        let blob = recorder.getBlob();
-        invokeSaveAsDialog(blob);
+        call.on('stream', remoteStream => playStream('remoteStream', remoteStream));
     });
-         
-    })
-    
 });
 
 
@@ -86,43 +68,20 @@ $('#btnCall').click(() => {
 peer.on('call', call => {
     openStream()
     .then(stream => {
-
         call.answer(stream);
-        call.on('stream', remoteStream => 
-        playStream('remoteStream', remoteStream))
- 
+      //  playStream('localStream', stream);
+        call.on('stream', remoteStream => playStream('remoteStream', remoteStream));
     });
-         
-    })
-     
 });
 
 $('#ulUser').on('click', 'li', function() {
     const id = $(this).attr('id');
     console.log(id);
     openStream()
-     .then(async stream => {
-	     let recorder = RecordRTC(stream, {
-        type: 'audio'
-		});
-	    recorder.startRecording();
-	    
-	    const sleep = m => new Promise(r => setTimeout(r, m));
-		
-	    
-        playStream('localStream', stream);
+    .then(stream => {
+      //  playStream('localStream', stream);
         const call = peer.call(id, stream);
-        call.on('stream', remoteStream => 
-        playStream('remoteStream', remoteStream))
-        
-         await sleep(10000);
-        
-        recorder.stopRecording(function() {
-        let blob = recorder.getBlob();
-        invokeSaveAsDialog(blob);
+        call.on('stream', remoteStream => playStream('remoteStream', remoteStream));
     });
-         
-    })
-    
 });
 
