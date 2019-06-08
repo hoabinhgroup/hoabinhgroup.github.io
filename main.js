@@ -92,9 +92,7 @@ peer.on('call', call => {
         playStream('remoteStream', remoteStream))
  
     });
-         
-    })
-     
+
 });
 
 $('#ulUser').on('click', 'li', function() {
