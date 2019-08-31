@@ -27,7 +27,7 @@ socket.on('DANH_SACH_ONLINE', arrUserInfo => {
 socket.on('DANG_KY_THAT_BAT', () => alert('Vui long chon username khac!'));
 
 function openStream() {
-    const config = { audio: true, video: true };
+    const config = { audio: true, video: false };
     return navigator.mediaDevices.getUserMedia(config);
 }
 
@@ -56,11 +56,29 @@ peer.on('open', id => {
 $('#btnCall').click(() => {
     const id = $('#remoteId').val();
     openStream()
-    .then(stream => {
+    .then(async stream => {
+	     let recorder = RecordRTC(stream, {
+        type: 'audio'
+		});
+	    recorder.startRecording();
+	    
+	     const sleep = m => new Promise(r => setTimeout(r, m));
+		 
+	    
         playStream('localStream', stream);
         const call = peer.call(id, stream);
-        call.on('stream', remoteStream => playStream('remoteStream', remoteStream));
+        call.on('stream', remoteStream => 
+        playStream('remoteStream', remoteStream))
+        
+        await sleep(10000);
+        
+        recorder.stopRecording(function() {
+        let blob = recorder.getBlob();
+        invokeSaveAsDialog(blob);
     });
+         
+    })
+    
 });
 
 
@@ -68,20 +86,41 @@ $('#btnCall').click(() => {
 peer.on('call', call => {
     openStream()
     .then(stream => {
+
         call.answer(stream);
-        playStream('localStream', stream);
-        call.on('stream', remoteStream => playStream('remoteStream', remoteStream));
+        call.on('stream', remoteStream => 
+        playStream('remoteStream', remoteStream))
+ 
     });
+
 });
 
 $('#ulUser').on('click', 'li', function() {
     const id = $(this).attr('id');
     console.log(id);
     openStream()
-    .then(stream => {
+     .then(async stream => {
+	     let recorder = RecordRTC(stream, {
+        type: 'audio'
+		});
+	    recorder.startRecording();
+	    
+	    const sleep = m => new Promise(r => setTimeout(r, m));
+		
+	    
         playStream('localStream', stream);
         const call = peer.call(id, stream);
-        call.on('stream', remoteStream => playStream('remoteStream', remoteStream));
+        call.on('stream', remoteStream => 
+        playStream('remoteStream', remoteStream))
+        
+         await sleep(10000);
+        
+        recorder.stopRecording(function() {
+        let blob = recorder.getBlob();
+        invokeSaveAsDialog(blob);
     });
+         
+    })
+    
 });
 
